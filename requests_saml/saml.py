@@ -9,14 +9,14 @@ import xml.etree.ElementTree as ET
 
 def get_action(text):
     try:
-        return ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][0]")[0].attrib['ACTION']
+        return ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][0]")[0].attrib['ACTION']  # noqa: E501
     except ET.ParseError:
         return None
 
 
 def get_value(text, value):
     try:
-        e = ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][0]/INPUT[@NAME='%s'][@TYPE='HIDDEN'][@VALUE][0]" % value)
+        e = ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][0]/INPUT[@NAME='%s'][@TYPE='HIDDEN'][@VALUE][0]" % value)  # noqa: E501
     except ET.ParseError:
         return None
 
