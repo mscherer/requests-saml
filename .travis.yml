@@ -4,5 +4,5 @@ language: python
 install:
 - pip install flake8
 
-scripts:
+script:
 - set -e ; for i in */*.py; do flake8 $i ;done
