@@ -1,3 +1,6 @@
+# code under the general public license v3 or above
+# (c) 2018 Michael Scherer <mscherer@redhat.com>
+
 from requests.auth import AuthBase
 import requests
 
