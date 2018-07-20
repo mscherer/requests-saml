@@ -8,14 +8,19 @@ import xml.etree.ElementTree as ET
 
 
 def get_action(text):
-    return ET.fromstring(text).findall("./BODY/FORM[$@METHOD='POST'][@ACTION][0]")[0].attrib['ACTION']
+    try:
+        return ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][0]")[0].attrib['ACTION']
+    except ET.ParseError:
+        return None
 
 
 def get_value(text, value):
-    e = ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][0]/INPUT[@NAME='%s'][@TYPE='HIDDEN'][@VALUE][0]" % value)
-    if e:
-        return e[0].attrib['VALUE']
-    return None
+    try:
+        e = ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][0]/INPUT[@NAME='%s'][@TYPE='HIDDEN'][@VALUE][0]" % value)
+    except ET.ParseError:
+        return None
+
+    return e[0].attrib['VALUE']
 
 
 class HTTPSAMLAuth(AuthBase):
@@ -25,20 +30,27 @@ class HTTPSAMLAuth(AuthBase):
 
     def handle_response(self, response, **kwargs):
         c = response.cookies
+        history = [response]
 
         v = get_value(response.text, 'SAMLRequest')
         if not v:
             return response
+
         r = requests.post(get_action(response.text),
                           data={"SAMLRequest": v},
                           auth=self.chained_auth)
+        history.append(r)
 
         v = get_value(r.text, 'SAMLResponse')
         if not v:
             return r
+
         r = requests.post(get_action(r.text),
                           cookies=c,
                           data={"SAMLResponse": v})
+        history.append(r)
+        r.history = history
+
         return r
 
     def __call__(self, request):
