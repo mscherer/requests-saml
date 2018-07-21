@@ -14,14 +14,14 @@ log = logging.getLogger(__name__)
 def get_action(text):
     try:
         return ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][1]")[0].attrib['ACTION']  # noqa: E501
-    except ET.ParseError:
+    except (ET.ParseError, UnicodeEncodeError):
         return None
 
 
 def get_value(text, value):
     try:
         e = ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][1]/INPUT[@NAME='%s'][@TYPE='HIDDEN'][@VALUE][1]" % value)  # noqa: E501
-    except ET.ParseError:
+    except (ET.ParseError, UnicodeEncodeError):
         return None
 
     return e[0].attrib['VALUE']
