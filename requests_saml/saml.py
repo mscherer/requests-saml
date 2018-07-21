@@ -3,8 +3,12 @@
 
 from requests.auth import AuthBase
 import requests
+import logging
+import warnings
 
 import xml.etree.ElementTree as ET
+
+log = logging.getLogger(__name__)
 
 
 def get_action(text):
@@ -32,6 +36,7 @@ class HTTPSAMLAuth(AuthBase):
         c = response.cookies
         history = [response]
 
+        log.debug("Initial response text: %s" % response.text)
         v = get_value(response.text, 'SAMLRequest')
         if not v:
             return response
@@ -41,8 +46,11 @@ class HTTPSAMLAuth(AuthBase):
                           auth=self.chained_auth)
         history.append(r)
 
+        log.debug("IDP response text: %s" % r.text)
         v = get_value(r.text, 'SAMLResponse')
         if not v:
+            warnings.warn("""SAML IDP %s didn't gave a good answer,
+                cancelling auth""" % get_action(response.text))
             return r
 
         r = requests.post(get_action(r.text),
