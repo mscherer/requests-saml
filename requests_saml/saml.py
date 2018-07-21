@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 def get_action(text):
     try:
-        return ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][0]")[0].attrib['ACTION']  # noqa: E501
+        return ET.fromstring(text).findall("./BODY/FORM[@METHOD='POST'][@ACTION][1]")[0].attrib['ACTION']  # noqa: E501
     except ET.ParseError:
         return None
 
