@@ -1,8 +1,13 @@
 ---
 language: python
 
+env:
+#- TOX_ENV=py36
+- TOX_ENV=py27
+- TOX_ENV=flake8
+
 install:
-- pip install flake8
+- pip install tox
 
 script:
-- set -e ; for i in */*.py; do flake8 $i ;done
+- tox -e $TOX_ENV
